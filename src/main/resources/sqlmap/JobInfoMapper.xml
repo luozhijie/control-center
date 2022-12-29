@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 转发重试数据访问 -->
+
+
+<mapper namespace="org.little.control.center.model.dao.JobInfoDao">
+
+    <resultMap id="result_map" type="org.little.control.center.model.entity.scheduler.JobInfo">
+        <result column="id" property="id"/>
+        <result column="handler" property="handler"/>
+        <result column="params" property="params"/>
+        <result column="cron_expression" property="cronExpression"/>
+        <result column="job_group" property="jobGroup"/>
+
+        <result column="job_name" property="jobName"/>
+        <result column="trigger_group" property="triggerGroup"/>
+        <result column="trigger_name" property="triggerName"/>
+        <result column="enable" property="enable"/>
+        <result column="pause" property="pause"/>
+        <result column="description" property="description"/>
+
+        <result column="last_exec_code" property="lastExecCode"/>
+        <result column="last_exec_time" property="lastExecTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="last_modified" property="lastModified"/>
+    </resultMap>
+
+    <!-- 数据表的列 -->
+    <sql id="columns">
+        id,handler,params,cron_expression,job_group,
+        job_name,trigger_group,trigger_name,enable,pause,
+        description,last_exec_code,last_exec_time,create_time,last_modified
+    </sql>
+
+    <!-- 根据ID查找。 -->
+    <select id="get" resultMap="result_map">
+        SELECT
+          <include refid="columns"/>
+        FROM
+          t_job_info
+        where id = #{id}
+    </select>
+
+    <!-- 查找列表 -->
+    <select id="list" resultMap="result_map" parameterType="org.little.control.center.model.entity.scheduler.JobInfoQueryParam">
+        SELECT
+          <include refid="columns"/>
+        FROM
+          t_job_info
+        <where>
+            <if test="pause != null">
+                pause = #{pause}
+            </if>
+            <if test="enable != null">
+                and enable = #{enable}
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 获取最大的ID值 -->
+    <select id="getMaxId" resultType="java.lang.Long">
+        select max(id) from t_job_info
+    </select>
+
+    <!--插入信息-->
+    <insert id="insert"
+            parameterType="org.little.control.center.model.entity.scheduler.JobInfo">
+        insert into t_job_info (
+          id,handler,params,cron_expression,job_group,job_name,
+          trigger_group,trigger_name,enable,pause,description,
+          create_time,last_modified
+        )  values (
+          #{id},#{handler},#{params},#{cronExpression},#{jobGroup},#{jobName},
+          #{triggerGroup},#{triggerName},#{enable},#{pause},#{description},
+          #{createTime},#{lastModified}
+        )
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="org.little.control.center.model.entity.scheduler.JobInfo">
+        update t_job_info set
+
+            handler			    = #{handler},
+            params	            = #{params},
+            cron_expression		= #{cronExpression},
+            job_group		    = #{jobGroup},
+            job_name			= #{jobName},
+
+            trigger_group	    = #{triggerGroup},
+            trigger_name		= #{triggerName},
+            enable		        = #{enable},
+            pause		        = #{pause},
+            description		    = #{description},
+            last_modified		= #{lastModified}
+
+        where
+            id	= #{id}
+    </update>
+
+    <!-- 更新最后执行状态和时间 -->
+    <update id="updateLastExec">
+        update t_job_info set
+            last_exec_code		= #{lastExecCode},
+            last_exec_time		= #{lastExecTime}
+        where
+            id	= #{id}
+    </update>
+
+
+    <!-- 删除 -->
+    <delete id="delete">
+        delete from t_job_info where id	= #{id}
+    </delete>
+
+
+</mapper>

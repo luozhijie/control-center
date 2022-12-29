@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>quartz配置</comment>
+
+    <!-- ******************************************************************************
+      * 固定前缀org.quartz
+       * 主要分为scheduler、threadPool、jobStore、plugin等部分
+    ****************************************************************************** -->
+
+    <!-- ******************************************************************************
+     * scheduler配置
+    ****************************************************************************** -->
+
+    <entry key="org.quartz.scheduler.instanceName">MY_TASK_EXECUTOR</entry>
+    <entry key="org.quartz.scheduler.rmi.export">false</entry>
+    <entry key="org.quartz.scheduler.rmi.proxy">false</entry>
+    <entry key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">false</entry>
+
+    <!-- ******************************************************************************
+     * threadPool配置
+    ****************************************************************************** -->
+
+    <!-- 实例化ThreadPool时，使用的线程类 -->
+    <entry key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</entry>
+
+    <!-- 并发个数 -->
+    <entry key="org.quartz.threadPool.threadCount">10</entry>
+
+    <!-- 优先级 -->
+    <entry key="org.quartz.threadPool.threadPriority">5</entry>
+
+    <entry key="org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread">true</entry>
+
+    <!-- ******************************************************************************
+     * jobStore配置
+    ****************************************************************************** -->
+
+    <entry key="org.quartz.jobStore.misfireThreshold">5000</entry>
+
+    <!-- 默认存储在内存中 -->
+    <entry key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</entry>
+
+    <!--<entry key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</entry>-->
+
+    <!--<entry key="org.quartz.jobStore.driverDelegateClass">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>-->
+
+    <!--<entry key="org.quartz.jobStore.tablePrefix">qrtz_</entry>-->
+
+    <!--
+    <entry key="org.quartz.jobStore.dataSource">qzDS</entry>
+    <entry key="org.quartz.jobStore.qzDS.driver">com.mysql.jdbc.Driver</entry>
+    <entry key="org.quartz.jobStore.qzDS.URL">jdbc:mysql://190.0.1.88:3306/hello_test?useUnicode=true&amp;characterEncoding=UTF-8</entry>
+    <entry key="org.quartz.jobStore.qzDS.user">root</entry>
+    <entry key="org.quartz.jobStore.qzDS.password">root</entry>
+    <entry key="org.quartz.jobStore.qzDS.maxConnections">10</entry>-->
+
+
+
+
+
+
+</properties>

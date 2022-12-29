@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+
+    <title>任务调度管理</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css?v=2" >
+    <script src="/js/jquery.js" language="javascript"> </script>
+
+    <style>
+        .service-id {
+            font-size:24px;
+            font-weight: bold;
+            color:black;
+        }
+    </style>
+
+    <script language="JavaScript">
+
+        /**
+         * 执行操作
+         */
+        function doAction(url, name, id) {
+            var ok = window.confirm("确定要" + name + "[id=" + id + "]吗？");
+            if(!ok) {
+                return;
+            }
+            url = url + "?_t=" + (new Date()).getTime();
+            var param = {"id" : id};
+            jQuery.getJSON(url,param, function(data){
+                if(data.code != 0) {
+                    alert(name + "错误：" + data.message);
+                    return;
+                }
+                getAll();
+            })
+
+        }//end doLogin
+
+
+
+        /**
+         * 获取所有服务
+         */
+        function getAll() {
+            jQuery.getJSON("/job/list?_t=" + (new Date()).getTime(),function(data){
+                if(data.code != 0) {
+                    alert("获取任务错误：" + data.message);
+                    return;
+                }
+                $("#jobList").empty();
+                for(var i = 0;i < data.data.length;i ++) {
+                    var job = data.data[i];
+
+                    var detail = "<table cellspacing='0px' class='normal' style='word-break:break-all; word-wrap:break-word;'>";
+                    detail += "<tr><td width='120'><b>任务说明：</b></td><td>" + job.description + "</td></tr>";
+                    detail += "<tr><td><b>参数：</b></td><td>" + job.params + "</td></tr>";
+                    detail += "<tr><td><b>任务分组/名称：</b></td><td>" + job.jobGroup + "&nbsp;/&nbsp;" + job.jobName + "</td></tr>";
+                    detail += "<tr><td><b>触发器分组/名称：</b></td><td>" + job.triggerGroup + "&nbsp;/&nbsp;" + job.triggerName + "</td></tr>";
+                    detail += "</table>";
+
+                    var html = '<tr>';
+                    html += '<td align="center">' + job.id + '</td>';
+                    html += '<td align="center">' + job.handler + '</td>';
+                    html += '<td align="left">' + detail + '</td>';
+                    html += '<td align="center">' + job.cronExpression + '</td>';
+                    // html += '<td align="center">' + job.jobName + '</td>';
+                    // html += '<td align="center">' + job.jobGroup + '</td>';
+                    // html += '<td align="center">' + job.triggerName + '</td>';
+                    // html += '<td align="center">' + job.triggerGroup + '</td>';
+                    // html += '<td align="center">' + job.description + '</td>';
+                    html += '<td align="center">' + job.createTime + '</td>';
+                    if (job.lastExecCode != null) {
+                        html += '<td align="center">' + job.lastExecTime + '</td>';
+                        var success = job.lastExecCode == 0 ? true : false;
+                        if (success) {
+                            html += '<td align="center"><a href="jobLog.html?jobId=' + job.id + '" target="_blank">正常</a></td>';
+                        } else {
+                            html += '<td align="center" style="color:red;"><a href="jobLog.html?jobId=' + job.id + '" target="_blank">异常</a></td>';
+                        }
+                    } else {
+                        html += '<td align="center">--</td>';
+                        html += '<td align="center">--</td>';
+                    }
+                    if (job.pause) {
+                        html += '<td align="center"><a href="javascript:void(0)" onClick="javascript:doAction(\'/job/resume\',\'恢复\',\'' + job.id + '\');">恢复</a></td>';
+                    } else {
+                        html += '<td align="center"><a href="javascript:void(0)" onClick="javascript:doAction(\'/job/pause\',\'暂停\',\'' + job.id + '\');">暂停</a></td>';
+                    }
+                    if (job.enable) {
+                        html += '<td align="center"><a href="javascript:void(0)" onClick="javascript:doAction(\'/job/disable\',\'禁用\',\'' + job.id + '\');">禁用</a></td>';
+                    } else {
+                        html += '<td align="center"><a href="javascript:void(0)" onClick="javascript:doAction(\'/job/enable\',\'启用\',\'' + job.id + '\');">启用</a></td>';
+                    }
+                    html += '<td align="center"><a href="javascript:void(0)" onClick="javascript:doAction(\'/job/process\',\'立即执行\',\'' + job.id + '\');">立即执行</a></td>';
+                    html += '<td align="center">';
+                    html += '<a href="/html/jobForm.html?id=' + job.id + '">修改</a>';
+                    html += '&nbsp;&nbsp;<a href="javascript:void(0)" onClick="javascript:doAction(\'/job/delete\',\'删除\',\'' + job.id + '\');">删除</a>';
+                    html += '</td>';
+                    html += '</tr>';
+
+                    $("#jobList").append(html);
+                }
+            })
+        }//end getIds
+
+        $(document).ready(function () {
+            getAll();
+        });
+    </script>
+
+</head>
+
+<body>
+
+<h1>任务调度管理</h1>
+
+<div>
+    <a href="/html/jobForm.html">添加任务</a>
+</div>
+
+<table class="view" cellspacing="1" width="98%;">
+    <thead>
+    <tr>
+        <th width="3%">ID</th>
+        <th width="3%">执行器</th>
+        <th width="40%">详情</th>
+        <th width="7%">执行表达式</th>
+        <th width="8%">创建时间</th>
+        <th width="8%">最后执行时间</th>
+        <th width="4%">最后执行结果</th>
+        <th width="4%">暂停/恢复</th>
+        <th width="4%">启用/禁用</th>
+        <th width="6%">立即执行</th>
+        <th width="6%">操作</th>
+    </tr>
+    </thead>
+    <tbody id="jobList">
+    <!--
+    <tr>
+        <td colspan="6" style="background-color: #d9e6e9;"><span class="service-id"> user-service </span> (2个实例)</td>
+    </tr>
+    <tr>
+        <td>dev01</td>
+        <td>http://dev01:7080/</td>
+        <td align="center">7000</td>
+        <td align="center">false</td>
+        <td align="center">UP</td>
+        <td align="center">解除</td>
+    </tr>-->
+
+    </tbody>
+</table>
+
+</body>
+
+
+</html>

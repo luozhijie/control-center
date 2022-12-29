@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 转发重试数据访问 -->
+
+
+<mapper namespace="org.little.control.center.model.dao.JobLogDao">
+
+
+
+    <!--插入信息-->
+    <insert id="insert"
+            parameterType="org.little.control.center.model.entity.scheduler.JobLog">
+        insert into t_job_log (
+          id,job_id,code,message,create_time
+        )  values (
+          #{id},#{jobId},#{code},#{message},#{createTime}
+        )
+    </insert>
+
+    <select id="listByJobId" resultType="org.little.control.center.model.entity.scheduler.JobLog">
+        select id,job_id as jobId,code,message,create_time as createTime from t_job_log where job_id = #{jobId} order by create_time desc
+    </select>
+
+    <!-- 获取日志的创建时间，按倒序排列 -->
+    <select id="getCreateTime" resultType="java.util.Date">
+        select create_time from t_job_log where job_id = #{jobId} order by create_time desc
+    </select>
+
+    <!-- 删除指定任务执行时间以前的日志 -->
+    <delete id="deleteBefore">
+        delete from t_job_log where job_id = #{jobId} and #{createTime} >= create_time
+    </delete>
+
+    <!-- 删除指定任务的执行日志 -->
+    <delete id="deleteByJobId">
+        delete from t_job_log where job_id = #{jobId}
+    </delete>
+
+
+
+
+</mapper>

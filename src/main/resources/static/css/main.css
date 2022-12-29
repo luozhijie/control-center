@@ -1,0 +1,54 @@
+@charset "utf-8";
+body {
+    background-color:#f5f8fa;
+    padding: 10px;
+    margin: 0;
+    color:#111;
+}
+body,div,td,a,span {
+    font-family: "Microsoft yahei","微软雅黑","宋体";
+}
+body {
+    font-size: 14px;
+}
+
+span.required{color:red;font-size:9pt;}
+
+
+.clearfix { *zoom: 1;}
+.clearfix:after{ content: ""; display: block; height: 0; visibility:hidden; clear: both;}
+#header{ width: 980px; height: 90px; margin: 0 auto; background: #f60;}
+#body{ margin: 0 auto;}
+#aside{ float: left;  background: #EAF0F4;}
+#main{ float: left; }
+
+/* ---------- 定义显示详情的表格样式 ------------ */
+TABLE.view {
+    border-collapse: collapse;font-size:14px;
+    color:#444;
+    border: 1px  solid #d9e6e9;
+    background-color: #DDD;
+}
+
+
+TABLE.view td {
+    padding:7px 7px;
+    background-color: white;
+    border: 1px solid #EDEDE0;
+    color:#111;
+}
+TABLE.view td.my-label {
+    color:#888;
+}
+TABLE.view td.my-bg {
+    background-color: #EFEFEF;
+}
+
+TABLE.normal {
+    border:0;
+}
+
+TABLE.normal TD {
+    border:0;
+    background-color: white;
+}

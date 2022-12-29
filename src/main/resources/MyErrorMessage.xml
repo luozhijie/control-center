@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>错误信息定义</comment>
+
+
+    <entry key="my.error.8090001">执行目标任务失败</entry>
+    <entry key="my.error.8090002">管理任务调度发生错误</entry>
+
+
+
+</properties>

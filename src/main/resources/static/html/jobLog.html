@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+
+    <title>任务执行日志</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css?v=2" >
+    <script src="/js/jquery.js" language="javascript"> </script>
+
+    <style>
+        .service-id {
+            font-size:24px;
+            font-weight: bold;
+            color:black;
+        }
+    </style>
+
+    <script language="JavaScript">
+
+        /**
+         * 获取参数
+         */
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null)return  unescape(r[2]); return null;
+        }
+
+
+
+        /**
+         * 获取所有服务
+         */
+        function getAll() {
+            jQuery.getJSON("/job/log/listByJobId?jobId=" + getQueryString("jobId") + "&_t=" + (new Date()).getTime(),function(data){
+                if(data.code != 0) {
+                    alert("获取任务日志错误：" + data.message);
+                    return;
+                }
+                $("#jobLogList").empty();
+                for(var i = 0;i < data.data.length;i ++) {
+                    var log = data.data[i];
+
+                    var html = '<tr>';
+                    html += '<td align="center">' + (i + 1) + '</td>';
+                    html += '<td align="center">' + log.createTime + '</td>';
+                    var success = log.code == 0 ? true : false;
+                    if (success) {
+                        html += '<td align="center">正常</td>';
+                    } else {
+                        html += '<td align="center" style="color:red;">异常</td>';
+                    }
+                    html += '<td>' + log.message + '</td>';
+                    html += '</tr>';
+
+                    $("#jobLogList").append(html);
+                }
+            })
+        }//end getIds
+
+        $(document).ready(function () {
+            getAll();
+        });
+    </script>
+
+</head>
+
+<body>
+
+<h1>任务执行日志</h1>
+
+只显示前面部分日志，依赖于配置参数logStoreLimit
+
+<br/>
+
+<table class="view" cellspacing="1" width="98%;">
+    <thead>
+    <tr>
+        <th width="10%">ID</th>
+        <th width="20%">执行时间</th>
+        <th width="10%">结果</th>
+        <th width="60%">描述</th>
+    </tr>
+    </thead>
+    <tbody id="jobLogList">
+
+
+    </tbody>
+</table>
+
+</body>
+
+
+</html>

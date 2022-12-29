@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="log.path" value="${user.home}/logs/control-center" />
+    <property name="log.level" value="info" />
+    <property name="log.my.level" value="debug" />
+
+    <!-- 开发环境配置 -->
+    <springProfile name="dev">
+        <property name="log.path" value="${user.home}/logs/control-center" />
+        <property name="log.level" value="info" />
+    </springProfile>
+
+    <!-- 测试环境配置 -->
+    <springProfile name="test">
+        <property name="log.path" value="${user.home}/logs/control-center" />
+        <property name="log.level" value="info" />
+    </springProfile>
+
+    <!-- 生产环境配置 -->
+    <springProfile name="js">
+        <property name="log.path" value="${user.home}/logs/control-center" />
+        <property name="log.level" value="info" />
+        <property name="log.my.level" value="info" />
+    </springProfile>
+
+    <!-- 生产环境配置 -->
+    <springProfile name="prod">
+        <property name="log.path" value="${user.home}/logs/control-center" />
+        <property name="log.level" value="info" />
+        <property name="log.my.level" value="info" />
+    </springProfile>
+
+    <!-- 本地日志级别 -->
+    <logger name="org.little" level="${log.my.level}" />
+
+    <!-- 日志输出格式 -->
+    <property name="log.pattern" value="[%d{yyyy-MM-dd HH:mm:ss.SSS,GMT+8} %-5p] [%t] %c - %m%n" />
+    <!-- 日志编码 -->
+    <property name="log.charset" value="UTF-8" />
+
+    <springProfile name="dev,test">
+        <!-- 只在开发环境输出到控制台 -->
+        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+            <!--encoder 默认配置为PatternLayoutEncoder-->
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>${log.charset}</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>debug</level>
+            </filter>
+        </appender>
+    </springProfile>
+
+    <!-- 日志记录到文件 -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${log.path}/log.log</file>
+
+        <!-- 设置文件个数和命名规则 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${log.path}/log.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>20</maxIndex><!-- 最大个数，无法超过20 -->
+        </rollingPolicy>
+
+        <!-- 设置日志文件大小 -->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy >
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${log.pattern}</pattern>
+            <charset>${log.charset}</charset>
+        </encoder>
+
+    </appender>
+
+    <!-- 警告及以上级别日志 -->
+    <appender name="file.warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${log.path}/log.warn.log</file>
+
+        <!-- 设置文件个数和命名规则 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${log.path}/log.warn.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>20</maxIndex><!-- 最大个数，无法超过20 -->
+        </rollingPolicy>
+
+        <!-- 设置日志文件大小 -->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${log.pattern}</pattern>
+            <charset>${log.charset}</charset>
+        </encoder>
+
+        <!-- 日志级别过滤 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>warn</level>
+        </filter>
+
+
+    </appender>
+
+    <root level="${log.level}">
+        <appender-ref ref="file" />
+        <appender-ref ref="file.warn"/>
+        <springProfile name="dev">
+            <appender-ref ref="console" />
+        </springProfile>
+    </root>
+
+
+
+</configuration>

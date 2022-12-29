@@ -1,0 +1,70 @@
+# -----------------------------------------------
+# application 配置
+# -----------------------------------------------
+spring.application.name: control-center
+
+spring.profiles.active: dev
+
+# -----------------------------------------------
+# 应用参数 配置
+# -----------------------------------------------
+
+# 每个任务保留的执行日志条数
+app.logStoreLimit: ${logStoreLimit:50}
+
+# -----------------------------------------------
+# server 配置
+# -----------------------------------------------
+server:
+  port: ${port:8090}
+  tomcat:
+    max-threads: 256 # 最大worker线程
+    min-spare-threads: 64 # 最小worker线程
+  undertow:
+    io-threads: 8 # IO线程数，默认为CPU核心数，最小为2
+    worker-threads: 40 # 阻塞任务线程池，值设置取决于系统的负载，默认为io-threads * 8
+    buffer-size: 512 # 每块buffer的空间大小
+    direct-buffers: true # 是否分配的直接内存
+
+
+# mybatis 配置
+mybatis:
+  mapper-locations: classpath:sqlmap/**/*.xml
+  config-location: classpath:mybatis-config.xml
+
+# MyBatis分页插件配置
+pagehelper:
+  # helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+
+# -----------------------------------------------
+# MVC 配置
+# -----------------------------------------------
+# 定位页面的目录到static/下
+spring.mvc.view:
+  prefix: /
+  suffix: .html
+
+
+# -----------------------------------------------
+# 发送内部请求的http client配置
+# -----------------------------------------------
+httpclient:
+  # 连接超时时间，单位毫秒
+  connectTimeout: 30000
+  # 等待数据超时时间，单位毫秒
+  socketTimeout: 600000
+  # 从连接池中获取连接的超时时间，单位毫秒。
+  # 超过该时间未拿到可用连接，会抛出org.apache.http.conn.ConnectionPoolTimeoutException: Timeout waiting for connection from pool
+  connectionRequestTimeout: 8000
+  # 连接池中最大连接数
+  maxTotal: 100
+  # 每个路由的最大连接数
+  defaultMaxPerRoute: 50
+  # 异步发送请求时，处理结果的线程数
+  ioThreadCount: 8
+  # IOReactorConfig.soKeepAlive
+  soKeepAlive: true

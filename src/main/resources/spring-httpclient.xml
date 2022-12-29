@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans  
+        	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        	http://www.springframework.org/schema/util 
+        	http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<description>http client配置</description>
+	
+	<bean id="requestConfigBuilder" class="org.apache.http.client.config.RequestConfig" factory-method="custom">
+		<property name="connectTimeout" value="${httpclient.connectTimeout}" /><!-- 单位毫秒 -->
+		<property name="socketTimeout" value="${httpclient.socketTimeout}" />
+		<property name="connectionRequestTimeout" value="${httpclient.connectionRequestTimeout}" />
+		<property name="cookieSpec" value="easy" /><!-- 该设置可以避免出现warn日志：org.apache.http.client.protocol.ResponseProcessCookies Cookie rejected -->
+	</bean>
+	
+	<bean id="requestConfig" factory-bean="requestConfigBuilder" factory-method="build" />
+	
+	<bean id="connectionConfigBuilder" class="org.apache.http.config.ConnectionConfig" factory-method="custom">
+	    <property name="charset">
+	        <util:constant static-field="org.apache.http.Consts.UTF_8"/>
+	    </property>
+	</bean>
+	
+	<bean id="connectionConfig" factory-bean="connectionConfigBuilder" factory-method="build" />
+	
+	<bean id="poolingHttpClientConnectionManager" class="org.apache.http.impl.conn.PoolingHttpClientConnectionManager">
+	    <property name="defaultConnectionConfig" ref="connectionConfig"/>
+		<property name="maxTotal" value="${httpclient.maxTotal}"/>
+		<property name="defaultMaxPerRoute" value="${httpclient.defaultMaxPerRoute}"/>
+	</bean>
+	
+	<bean id="httpClientBuilder" class="org.apache.http.impl.client.HttpClientBuilder" factory-method="create">
+    	<property name="defaultRequestConfig" ref="requestConfig" />
+    	<property name="connectionManager" ref="poolingHttpClientConnectionManager"/>
+	</bean>
+	
+	<!-- HTTP客户端，将会被代码引用，ID不能更改 -->
+	<bean id="httpClient" factory-bean="httpClientBuilder" factory-method="build" destroy-method="close"/>
+
+	<!-- ======================= 异步请求相关设置 ======================= -->
+
+	<bean id="ioReactorConfigBuilder" class="org.apache.http.impl.nio.reactor.IOReactorConfig" factory-method="custom">
+		<property name="connectTimeout" value="${httpclient.connectTimeout}" /><!-- 单位毫秒 -->
+		<property name="soTimeout" value="${httpclient.socketTimeout}" /><!-- 单位毫秒 -->
+		<property name="soKeepAlive" value="${httpclient.soKeepAlive}"/>
+		<property name="ioThreadCount" value="${httpclient.ioThreadCount}"/>
+	</bean>
+
+	<bean id="ioReactorConfig" factory-bean="ioReactorConfigBuilder" factory-method="build" />
+
+	<bean id="connectingIOReactor" class="org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor">
+		<constructor-arg index="0" ref="ioReactorConfig" />
+	</bean>
+
+	<bean id="poolingNHttpClientConnectionManager" class="org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager">
+		<constructor-arg index="0" ref="connectingIOReactor"/>
+		<property name="defaultConnectionConfig" ref="connectionConfig"/>
+		<property name="maxTotal" value="${httpclient.maxTotal}"/> <!-- 最大连接数 -->
+		<property name="defaultMaxPerRoute" value="${httpclient.defaultMaxPerRoute}"/><!-- 每个路由最大连接数 -->
+	</bean>
+
+	<bean id="httpAsyncClientBuilder" class="org.apache.http.impl.nio.client.HttpAsyncClients" factory-method="custom">
+		<property name="defaultRequestConfig" ref="requestConfig" />
+		<property name="connectionManager" ref="poolingNHttpClientConnectionManager"/>
+	</bean>
+
+	<!-- HTTP 异步客户端，将会被代码引用，ID不能更改 -->
+	<bean id="httpAsyncClient" factory-bean="httpAsyncClientBuilder" factory-method="build" destroy-method="close" init-method="start"/>
+	
+</beans>
